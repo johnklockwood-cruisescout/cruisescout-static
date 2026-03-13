@@ -65,7 +65,7 @@ window.Webflow.push(function () {
     return __destinationsPromise;
   }
 
-  function getDestinationMatches(items, query, limit = 5) {
+  function getDestinationMatches(items, query, limit = 10) {
     const q = (query || "").toLowerCase().trim();
 
     if (!q) return items.slice(0, limit);
@@ -857,7 +857,7 @@ function initDestinationPicker(searchBar) {
   }
 
   function filterDestinations(query) {
-    const matches = getDestinationMatches(allDestinations, query, 5);
+    const matches = getDestinationMatches(allDestinations, query, 10);
     renderResults(matches);
     dropdown.style.display = matches.length ? "block" : "none";
     updateDestinationClearVisibility();
@@ -894,7 +894,7 @@ function initDestinationPicker(searchBar) {
     loadDestinations()
       .then(items => {
         allDestinations = items;
-        renderResults(allDestinations.slice(0, 5));
+        renderResults(allDestinations.slice(0, 10));
 
         if (dest && dest !== "anywhere") {
           const match = allDestinations.find(item => item.slug === dest);
@@ -991,7 +991,7 @@ function initDestinationPicker(searchBar) {
       clearBtn.classList.remove("visible");
 
       if (allDestinations.length) {
-        renderResults(allDestinations.slice(0, 5));
+        renderResults(allDestinations.slice(0, 10));
       }
 
       dropdown.style.display = "block";
