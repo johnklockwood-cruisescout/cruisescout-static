@@ -53,7 +53,12 @@ window.Webflow.push(function () {
         return res.json();
       })
       .then(data => {
-        __destinationsData = Array.isArray(data?.items) ? data.items : [];
+        __destinationsData = (Array.isArray(data?.items) ? data.items : [])
+          .sort((a, b) => {
+            const ak = a.sortKey || "";
+            const bk = b.sortKey || "";
+            return ak.localeCompare(bk);
+          });
         return __destinationsData;
       })
       .catch(err => {
