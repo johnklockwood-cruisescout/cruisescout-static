@@ -1477,36 +1477,26 @@ if (startDate && !endDate && hoverDate) {
   })();
 
 function handleDateClick(dateObj) {
-
   if (!startDate || (startDate && endDate)) {
     window.startDate = startDate = dateObj;
-    endDate   = null;
-    hoverDate = null;
+    window.endDate   = endDate = null;
+    window.hoverDate = hoverDate = null;
   }
 
   else if (startDate && !endDate) {
-
-    if (isBefore(dateObj, startDate)) {
+    if (isBefore(dateObj, startDate) || isSameDay(dateObj, startDate)) {
       window.startDate = startDate = dateObj;
-      endDate   = null;
-      hoverDate = null;
-    }
-
-    else if (isSameDay(dateObj, startDate)) {
-      window.startDate = startDate = dateObj;
-      endDate   = null;
-      hoverDate = null;
-    }
-
-    else {
-      window.endDate = endDate = dateObj;
-      hoverDate = null;    
+      window.endDate   = endDate = null;
+      window.hoverDate = hoverDate = null;
+    } else {
+      window.endDate   = endDate = dateObj;
+      window.hoverDate = hoverDate = null;
     }
   }
 
   renderCalendars();
   updatePlaceholder();
-  updateDateClearVisibility(); 
+  updateDateClearVisibility();
 }
 
 area.addEventListener("click", (e) => {
