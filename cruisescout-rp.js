@@ -1263,7 +1263,8 @@ function fillCard(card, record) {
 
     if (node.tagName === "IMG") {
       const wrapper = node.closest(".card-image-shell");
-      const imageUrl = value && String(value).trim();
+      const rawImageUrl = value && String(value).trim();
+      const imageUrl = rawImageUrl ? transformImage(rawImageUrl, "card") : "";
 
       if (wrapper) {
         wrapper.classList.add("skeleton");
