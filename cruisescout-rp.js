@@ -1340,7 +1340,7 @@ function fillCard(card, record) {
   }
 
 
-  function activateCardClicks() {
+function activateCardClicks() {
   const cards = document.querySelectorAll(".sailing-card");
 
   cards.forEach(card => {
@@ -1357,8 +1357,16 @@ function fillCard(card, record) {
 
     const link = document.createElement("a");
     link.href = url.toString();
-    link.target = "_blank";
-    link.rel = "noopener";
+
+    const isTabletOrBelow = window.innerWidth <= 991;
+
+    if (isTabletOrBelow) {
+      link.target = "_self"; // mobile same tab
+    } else {
+      link.target = "_blank"; // desktop new tab
+      link.rel = "noopener";
+    }
+
     link.className = "card-link-overlay";
 
     Object.assign(link.style, {
