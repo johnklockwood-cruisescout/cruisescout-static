@@ -1566,7 +1566,7 @@ bindDateClear();
     }
 
     const qs = params.toString();
-    window.location.href = "/cruises" + (qs ? `?${qs}` : "");
+    window.location.href = "/cruise-search" + (qs ? `?${qs}` : "");
   });
 })();
     
@@ -1600,7 +1600,7 @@ document.querySelectorAll(".search-bar").forEach(searchBar => {
     params.set("sort", "recommended");
 
     const qs = params.toString();
-    window.location.href = "/cruises" + (qs ? `?${qs}` : "");
+    window.location.href = "/cruise-search" + (qs ? `?${qs}` : "");
   });
 });
 
