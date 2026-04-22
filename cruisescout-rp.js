@@ -69,7 +69,7 @@ function updateCruisesSEO({ destinationSlug, destinationName, results }) {
     setPageMeta({
       title: `${destinationName} Cruises | CruiseScout - Compare prices and find great deals`,
       description: `Discover ${destinationName} cruises from 40+ cruise lines and compare prices across booking sites. Save time and money by planning your next cruise vacation with CruiseScout.`,
-      canonical: `${window.location.origin}/cruises?destination=${destinationSlug}`
+      canonical: `${window.location.origin}/cruise-search?destination=${destinationSlug}`
     });
   } else {
     setMetaTag("name", "robots", "noindex,follow");
@@ -95,7 +95,7 @@ if (window.IS_RESULTS_PAGE) {
 
   const crumbs = [
     { label: "Home", href: "/" },
-    { label: "Cruises", href: "/cruises" }
+    { label: "Cruises", href: "/cruise-search" }
   ];
 
   if (destination && destination !== "anywhere") {
@@ -461,7 +461,7 @@ function refreshSearch() {
 
 document.addEventListener("DOMContentLoaded", () => {
 
-  if (window.location.pathname !== "/cruises") return;
+  if (window.location.pathname !== "/cruise-search") return;
 
   console.log("🚀 Results renderer loaded");
   
