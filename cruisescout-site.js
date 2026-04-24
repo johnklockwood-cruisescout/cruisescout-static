@@ -245,6 +245,14 @@ window.Webflow.push(function () {
         headerWrapper.classList.remove("is-expanded");
       }
 
+      function keepMobileEditorOpen() {
+        if (!window.IS_RESULTS_PAGE || !isMobile()) return;
+        isExpanded = true;
+        headerWrapper.classList.add("is-expanded");
+      }
+
+      window.keepMobileEditorOpen = keepMobileEditorOpen;
+
       /* -------------
          CLICK ROUTING
       ---------------- */
@@ -266,6 +274,14 @@ window.Webflow.push(function () {
 
       document.addEventListener("click", function (e) {
         if (!isExpanded) return;
+
+        if (
+          e.target.closest("#mobile-destination-modal") ||
+          e.target.closest("#mobile-date-modal")
+        ) {
+          return;
+        }
+
         if (!editor.contains(e.target) && !searchSlot.contains(e.target)) {
           closeEditor();
         }
@@ -612,16 +628,23 @@ window.Webflow.push(function () {
     const slug  = opt.dataset.slug || "";
 
     syncHeroDestination(label, slug);
-    
+
     destInput.value = label;
     syncMobileDestPlaceholder();
     updateMobileDestClearVisibility();
 
     closeModal(destModal);
-    openDateModal(); 
+
+    // RP mobile: keep header search editor open after modal closes
+    window.keepMobileEditorOpen?.();
   });
 
-  if (destClose) destClose.addEventListener("click", () => closeModal(destModal));
+  if (destClose) {
+    destClose.addEventListener("click", () => {
+      closeModal(destModal);
+      window.keepMobileEditorOpen?.();
+    });
+  }
 
   /* ----------
      DATE MODAL
@@ -774,13 +797,19 @@ window.Webflow.push(function () {
     updateMobileApplyState();
   }
 
-  if (dateClose) dateClose.addEventListener("click", () => closeModal(dateModal));
+  if (dateClose) {
+    dateClose.addEventListener("click", () => {
+      closeModal(dateModal);
+      window.keepMobileEditorOpen?.();
+    });
+  }
 
   if (dateApply) {
     dateApply.addEventListener("click", () => {
       commitPendingToGlobal();
       syncHeroDates();
       closeModal(dateModal);
+      window.keepMobileEditorOpen?.();
     });
   }
 
@@ -1608,7 +1637,7 @@ function buildSearchUrlFromBar(searchBar) {
 
   if (!modalSourceBar) return;
 
-  const btn = modalSourceBar.querySelector(".search-button-mobile, .mobile-search-editor-button");
+  const btn = modalSourceBar.querySelector(".search-button-mobile");
   if (!btn) {
     console.warn("[mobile submit] .search-button-mobile not found");
     return;
