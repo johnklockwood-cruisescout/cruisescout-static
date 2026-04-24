@@ -139,7 +139,7 @@ window.Webflow.push(function () {
           e.preventDefault();
           e.stopPropagation();
 
-          const editorBar = editor.querySelector(".search-bar");
+          const editorBar = document.querySelector(".header-search-editor .search-bar");
           if (!editorBar) return;
 
           window.location.href = buildSearchUrlFromBar(editorBar);
@@ -278,11 +278,10 @@ window.Webflow.push(function () {
  * MOBILE SEARCH MODALS
  **********************/
 (function initMobileSearchModals() {
-  const isMobile = () => window.innerWidth <= 479;
 
-  const modalSourceBar =
-    document.querySelector(".home-page-hero .search-bar") ||
-    document.querySelector(".header-search-editor .search-bar");
+  const modalSourceBar = window.IS_RESULTS_PAGE
+    ? document.querySelector(".header-search-editor .search-bar")
+    : document.querySelector(".home-page-hero .search-bar");
 
   if (!modalSourceBar) return;
 
@@ -1571,9 +1570,17 @@ bindDateClear();
 
 function buildSearchUrlFromBar(searchBar) {
   const params = new URLSearchParams();
-
   const destInput = searchBar.querySelector("#destination-input");
-  if (destInput && destInput.dataset.slug) {
+
+  console.log("[SEARCH DEBUG]", {
+    searchBar,
+    destValue: destInput?.value,
+    destSlug: destInput?.dataset.slug,
+    startDate: window.startDate,
+    endDate: window.endDate
+  });
+
+  if (destInput?.dataset.slug) {
     params.set("destination", destInput.dataset.slug);
   }
 
@@ -1585,8 +1592,9 @@ function buildSearchUrlFromBar(searchBar) {
     params.set("end", window.endDate.toISOString().split("T")[0]);
   }
 
-  const qs = params.toString();
-  return "/cruises" + (qs ? `?${qs}` : "");
+  params.set("sort", "recommended");
+
+  return "/cruise-search?" + params.toString();
 }
 
 
