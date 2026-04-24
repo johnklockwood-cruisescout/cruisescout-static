@@ -120,6 +120,17 @@ window.Webflow.push(function () {
 
       searchSlot.classList.add("visible");
 
+      const mobileEditorClose = editor.querySelector("#mobile-search-editor-close, .mobile-search-editor-close");
+
+      if (mobileEditorClose && !mobileEditorClose.__bound) {
+        mobileEditorClose.__bound = true;
+        mobileEditorClose.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          closeEditor();
+        });
+      }
+
       /* ----------------------
          URL → HEADER HYDRATION
       ------------------------- */
@@ -191,21 +202,25 @@ window.Webflow.push(function () {
 
         headerWrapper.classList.add("is-expanded");
 
-		requestAnimationFrame(() => {
-		  if (expandIntent === "destination") {
-		    const sb = document.querySelector(".header-search-editor .search-bar");
- 		    sb?.openDestinationDropdown?.();
-		  }
+        requestAnimationFrame(() => {
+          if (isMobile()) {
+            expandIntent = null;
+            return;
+          }
 
- 		 if (expandIntent === "dates") {
-  			const sb = document.querySelector(".header-search-editor .search-bar");
- 			 sb?.openDatepicker?.();
+          if (expandIntent === "destination") {
+            const sb = document.querySelector(".header-search-editor .search-bar");
+            sb?.openDestinationDropdown?.();
+          }
 
- 			 sb && typeof window.renderCalendars === "function" && window.renderCalendars();
-			}
+          if (expandIntent === "dates") {
+            const sb = document.querySelector(".header-search-editor .search-bar");
+            sb?.openDatepicker?.();
+            sb && typeof window.renderCalendars === "function" && window.renderCalendars();
+          }
 
- 		 expandIntent = null;
-		});
+          expandIntent = null;
+        });
       }
 
       function closeEditor() {
@@ -219,6 +234,13 @@ window.Webflow.push(function () {
          CLICK ROUTING
       ---------------- */
       searchSlot.addEventListener("click", function (e) {
+        if (isMobile()) {
+          e.preventDefault();
+          e.stopPropagation();
+          openEditor(null); 
+          return;
+        }
+
         const destArea = e.target.closest("#header-destination-area");
         const dateArea = e.target.closest("#header-date-area");
 
@@ -243,16 +265,16 @@ window.Webflow.push(function () {
 (function initMobileSearchModals() {
   const isMobile = () => window.innerWidth <= 479;
 
-  const heroBar = document.querySelector(".home-page-hero .search-bar");
+  const modalSourceBar = document.querySelector(".home-page-hero .search-bar");
   if (!heroBar) return;
 
-  const heroDestArea = heroBar.querySelector("#destination-area");
-  const heroDestInput = heroBar.querySelector("#destination-input");
-  const heroDestPlaceholder = heroBar.querySelector("#destination-placeholder");
+  const heroDestArea = modalSourceBar.querySelector("#destination-area");
+  const heroDestInput = modalSourceBar.querySelector("#destination-input");
+  const heroDestPlaceholder = modalSourceBar.querySelector("#destination-placeholder");
 
-  const heroDateArea = heroBar.querySelector("#date-area");
-  const heroDateInput = heroBar.querySelector("#date-input");
-  const heroDatePlaceholder = heroBar.querySelector("#date-placeholder");
+  const heroDateArea = modalSourceBar.querySelector("#date-area");
+  const heroDateInput = modalSourceBar.querySelector("#date-input");
+  const heroDatePlaceholder = modalSourceBar.querySelector("#date-placeholder");
 
   const destModal = document.getElementById("mobile-destination-modal");
   const destClose = document.getElementById("mobile-destination-close");
@@ -1529,14 +1551,52 @@ bindDateClear();
 
 }
 
+function buildSearchUrlFromBar(searchBar) {
+  const params = new URLSearchParams();
+
+  const destInput = searchBar.querySelector("#destination-input");
+  if (destInput && destInput.dataset.slug) {
+    params.set("destination", destInput.dataset.slug);
+  }
+
+  if (window.startDate instanceof Date) {
+    params.set("start", window.startDate.toISOString().split("T")[0]);
+  }
+
+  if (window.endDate instanceof Date) {
+    params.set("end", window.endDate.toISOString().split("T")[0]);
+  }
+
+  const qs = params.toString();
+  return "/cruises" + (qs ? `?${qs}` : "");
+}
+
+const mobileEditorButton = editor.querySelector("#mobile-search-editor-button, .mobile-search-editor-button");
+
+if (mobileEditorButton && !mobileEditorButton.__bound) {
+  mobileEditorButton.__bound = true;
+  mobileEditorButton.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const editorBar = editor.querySelector(".search-bar");
+    if (!editorBar) return;
+
+    window.location.href = buildSearchUrlFromBar(editorBar);
+  });
+}
+
 /***********************
  * MOBILE SEARCH SUBMIT
  ***********************/
 (function bindMobileHeroSubmit() {
-  const heroBar = document.querySelector(".home-page-hero .search-bar");
-  if (!heroBar) return;
+  const modalSourceBar =
+    document.querySelector(".home-page-hero .search-bar") ||
+    document.querySelector(".header-search-editor .search-bar");
 
-  const btn = heroBar.querySelector(".search-button-mobile");
+  if (!modalSourceBar) return;
+
+  const btn = modalSourceBar.querySelector(".search-button-mobile");
   if (!btn) {
     console.warn("[mobile submit] .search-button-mobile not found");
     return;
@@ -1552,7 +1612,7 @@ bindDateClear();
     const params = new URLSearchParams();
 
     // Destination
-    const destInput = heroBar.querySelector("#destination-input");
+    const destInput = modalSourceBar.querySelector("#destination-input");
     if (destInput && destInput.dataset.slug) {
       params.set("destination", destInput.dataset.slug);
     }
