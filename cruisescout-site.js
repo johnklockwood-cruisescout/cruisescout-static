@@ -131,6 +131,21 @@ window.Webflow.push(function () {
         });
       }
 
+      const mobileEditorButton = editor.querySelector("#mobile-search-editor-button, .mobile-search-editor-button");
+
+      if (mobileEditorButton && !mobileEditorButton.__bound) {
+        mobileEditorButton.__bound = true;
+        mobileEditorButton.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+
+          const editorBar = editor.querySelector(".search-bar");
+          if (!editorBar) return;
+
+          window.location.href = buildSearchUrlFromBar(editorBar);
+        });
+      }
+
       /* ----------------------
          URL → HEADER HYDRATION
       ------------------------- */
@@ -265,8 +280,11 @@ window.Webflow.push(function () {
 (function initMobileSearchModals() {
   const isMobile = () => window.innerWidth <= 479;
 
-  const modalSourceBar = document.querySelector(".home-page-hero .search-bar");
-  if (!heroBar) return;
+  const modalSourceBar =
+    document.querySelector(".home-page-hero .search-bar") ||
+    document.querySelector(".header-search-editor .search-bar");
+
+  if (!modalSourceBar) return;
 
   const heroDestArea = modalSourceBar.querySelector("#destination-area");
   const heroDestInput = modalSourceBar.querySelector("#destination-input");
@@ -1571,20 +1589,6 @@ function buildSearchUrlFromBar(searchBar) {
   return "/cruises" + (qs ? `?${qs}` : "");
 }
 
-const mobileEditorButton = editor.querySelector("#mobile-search-editor-button, .mobile-search-editor-button");
-
-if (mobileEditorButton && !mobileEditorButton.__bound) {
-  mobileEditorButton.__bound = true;
-  mobileEditorButton.addEventListener("click", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const editorBar = editor.querySelector(".search-bar");
-    if (!editorBar) return;
-
-    window.location.href = buildSearchUrlFromBar(editorBar);
-  });
-}
 
 /***********************
  * MOBILE SEARCH SUBMIT
@@ -1596,7 +1600,7 @@ if (mobileEditorButton && !mobileEditorButton.__bound) {
 
   if (!modalSourceBar) return;
 
-  const btn = modalSourceBar.querySelector(".search-button-mobile");
+  const btn = modalSourceBar.querySelector(".search-button-mobile, .mobile-search-editor-button");
   if (!btn) {
     console.warn("[mobile submit] .search-button-mobile not found");
     return;
