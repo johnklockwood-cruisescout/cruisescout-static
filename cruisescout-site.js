@@ -893,11 +893,17 @@ function initDestinationPicker(searchBar) {
   function updateDestinationClearVisibility() {
     if (!clearBtn) return;
 
-    const hasValue = input.value.trim().length > 0;
-    const dropdownOpen = window.getComputedStyle(dropdown).display !== "none";
+    const hasValue = input.value.trim().length > 0 || !!input.dataset.slug;
 
-    if (hasValue && dropdownOpen) clearBtn.classList.add("visible");
-    else clearBtn.classList.remove("visible");
+    // Mobile editor/home: show whenever selected/typed
+    if (isMobile()) {
+      clearBtn.classList.toggle("visible", hasValue);
+      return;
+    }
+
+    // Desktop: keep old behavior
+    const dropdownOpen = window.getComputedStyle(dropdown).display !== "none";
+    clearBtn.classList.toggle("visible", hasValue && dropdownOpen);
   }
 
   function updateActiveOption() {
@@ -944,6 +950,8 @@ function initDestinationPicker(searchBar) {
     input.style.fontWeight = "600";
 
     if (placeholder) placeholder.style.opacity = "0";
+
+    updateDestinationClearVisibility();
 
     if (isMobile()) {
       return;
@@ -1054,6 +1062,7 @@ function initDestinationPicker(searchBar) {
 
   if (clearBtn) {
     clearBtn.addEventListener("click", (e) => {
+      e.preventDefault();
       e.stopPropagation();
 
       input.value = "";
@@ -1061,13 +1070,14 @@ function initDestinationPicker(searchBar) {
       input.style.fontWeight = "400";
 
       if (placeholder) placeholder.style.opacity = "1";
-      clearBtn.classList.remove("visible");
 
       if (allDestinations.length) {
         renderResults(allDestinations.slice(0, 10));
       }
 
-      dropdown.style.display = "block";
+      if (!isMobile()) dropdown.style.display = "block";
+
+      input.dispatchEvent(new Event("input", { bubbles: true }));
       updateDestinationClearVisibility();
     });
   }
