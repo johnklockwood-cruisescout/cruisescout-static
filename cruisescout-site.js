@@ -502,10 +502,16 @@ window.Webflow.push(function () {
 
     const open = (e) => {
       if (!isMobile()) return;
+
+      // Do not open modal when tapping clear buttons
+      if (e.target.closest("#destination-clear, #date-clear, .clear-btn")) {
+        return;
+      }
+
       e.preventDefault();
       e.stopPropagation();
       fn(e);
-   };
+    };
 
     el.addEventListener("touchstart", open, { passive: false });
     el.addEventListener("pointerdown", open, { passive: false });
@@ -995,6 +1001,7 @@ function initDestinationPicker(searchBar) {
   })();
 
   area.addEventListener("click", (e) => {
+    if (e.target.closest("#destination-clear, .clear-btn")) return;
     if (isMobile()) return;
 
     e.stopPropagation();
