@@ -1060,10 +1060,13 @@ function initDestinationPicker(searchBar) {
     }
   });
 
-  if (clearBtn) {
-    clearBtn.addEventListener("click", (e) => {
+  if (clearBtn && !clearBtn.__bound) {
+    clearBtn.__bound = true;
+
+    const clearDestination = (e) => {
       e.preventDefault();
       e.stopPropagation();
+      e.stopImmediatePropagation();
 
       input.value = "";
       delete input.dataset.slug;
@@ -1077,9 +1080,11 @@ function initDestinationPicker(searchBar) {
 
       if (!isMobile()) dropdown.style.display = "block";
 
-      input.dispatchEvent(new Event("input", { bubbles: true }));
       updateDestinationClearVisibility();
-    });
+    };
+
+    clearBtn.addEventListener("pointerdown", clearDestination, { passive: false });
+    clearBtn.addEventListener("click", clearDestination, true);
   }
 
   searchBar.openDestinationDropdown = function () {
