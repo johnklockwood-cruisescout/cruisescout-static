@@ -830,6 +830,7 @@ window.Webflow.push(function () {
     dateApply.addEventListener("click", () => {
       commitPendingToGlobal();
       syncHeroDates();
+      modalSourceBar.updateDateClearVisibility?.();
       closeModal(dateModal);
       window.keepMobileEditorOpen?.();
     });
@@ -1327,11 +1328,20 @@ function updateDateClearVisibility() {
   const clearBtn = searchBar.querySelector("#date-clear");
   if (!clearBtn) return;
 
-  const hasValue = window.startDate !== null;
-  const open = dropdown.classList.contains("dropdown-open");
+  const hasValue = window.startDate instanceof Date;
 
+  // Mobile editor/home: show whenever dates are selected
+  if (isMobile()) {
+    clearBtn.classList.toggle("visible", hasValue);
+    return;
+  }
+
+  // Desktop: keep old behavior
+  const open = dropdown.classList.contains("dropdown-open");
   clearBtn.classList.toggle("visible", hasValue && open);
 }
+
+searchBar.updateDateClearVisibility = updateDateClearVisibility;
 
 function renderCalendars() {
   startDate = window.startDate;
