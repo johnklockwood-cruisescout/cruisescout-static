@@ -29,6 +29,21 @@ window.Webflow.push(function () {
   
   const MOBILE_BP = 479;
   const isMobile = () => window.innerWidth <= MOBILE_BP;
+
+  function syncHeaderLogoState() {
+    const header = document.querySelector(".header-wrapper");
+    const slot = document.querySelector(".header-search-slot");
+    if (!header || !slot) return;
+
+    const slotVisible =
+      slot.classList.contains("visible") &&
+      window.getComputedStyle(slot).display !== "none";
+
+    header.classList.toggle("has-header-search", slotVisible);
+  }
+
+  syncHeaderLogoState();
+  window.addEventListener("resize", syncHeaderLogoState);
   
   const DESTINATIONS_URL = "https://destinations-sync.john-744.workers.dev/destinations.json";
   let __destinationsPromise = null;
@@ -119,6 +134,7 @@ window.Webflow.push(function () {
     if (headerWrapper && searchSlot && editor) {
 
       searchSlot.classList.add("visible");
+      syncHeaderLogoState();
 
       const mobileEditorClose = editor.querySelector("#mobile-search-editor-close, .mobile-search-editor-close");
 
